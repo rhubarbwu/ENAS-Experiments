@@ -3,6 +3,7 @@ from .model.average_meter import AverageMeter
 from time import time
 import torch
 from torch import nn
+import matplotlib.pyplot as plt
 
 
 def train_shared_cnn(epoch,
@@ -97,7 +98,7 @@ def train_shared_cnn(epoch,
     plt.title('Shared CNN')
     plt.xlabel('Iteration')
     plt.savefig("child_training_curve.png")
-    plt.show()
+    # plt.show()
 
     # vis_win['shared_cnn_loss'] = vis.line(
     #     X=np.array([epoch]),
@@ -226,7 +227,7 @@ def train_controller(epoch,
     plt.title('Controller')
     plt.xlabel('Iteration')
     plt.savefig("controller_training_curve.png")
-    plt.show()
+    # plt.show()
 
     # vis_win['controller_reward'] = vis.line(
     #     X=np.column_stack([epoch] * 2),
