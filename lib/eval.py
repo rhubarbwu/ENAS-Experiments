@@ -1,3 +1,6 @@
+import torch
+
+
 def evaluate_model(epoch, controller, shared_cnn, data_loaders, n_samples=10):
     """Print the validation and test accuracy for a controller and shared_cnn.
     Args:

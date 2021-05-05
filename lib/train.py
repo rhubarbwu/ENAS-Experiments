@@ -1,4 +1,5 @@
 from .model.average_meter import AverageMeter
+from .eval import evaluate_model
 
 from time import time
 import torch
@@ -165,7 +166,7 @@ def train_controller(epoch,
                                         1)[1] == labels).type(torch.float))
 
         # detach to make sure that gradients aren't backpropped through the reward
-        reward = torch.tensor(val_acc.detach())
+        reward = val_acc.clone().detach()
         reward += args['controller_entropy_weight'] * controller.sample_entropy
 
         if baseline is None:
