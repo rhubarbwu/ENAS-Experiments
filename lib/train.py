@@ -3,7 +3,6 @@ from .model.average_meter import AverageMeter
 from time import time
 import torch
 from torch import nn
-import matplotlib.pyplot as plt
 
 
 def train_shared_cnn(epoch,
@@ -85,27 +84,30 @@ def train_shared_cnn(epoch,
     #     opts=dict(title='shared_cnn_acc', xlabel='Iteration', ylabel='Accuracy'),
     #     update='append' if epoch > 0 else None)
 
-    plt.figure()
-    plt.plot(np.array([epoch]),
-             np.array([train_acc_meter.avg]),
-             'ro-',
-             label='Shared CNN Accuracy')
-    plt.plot(np.array([epoch]),
-             np.array([loss_meter.avg]),
-             'go-',
-             label='Shared CNN Loss')
-    plt.legend()
-    plt.title('Shared CNN')
-    plt.xlabel('Iteration')
-    plt.savefig("child_training_curve.png")
-    # plt.show()
+    if args["plots"]:
+        import matplotlib.pyplot as plt
 
-    # vis_win['shared_cnn_loss'] = vis.line(
-    #     X=np.array([epoch]),
-    #     Y=np.array([loss_meter.avg]),
-    #     win=vis_win['shared_cnn_loss'],
-    #     opts=dict(title='shared_cnn_loss', xlabel='Iteration', ylabel='Loss'),
-    #     update='append' if epoch > 0 else None)
+        plt.figure()
+        plt.plot(np.array([epoch]),
+                 np.array([train_acc_meter.avg]),
+                 'ro-',
+                 label='Shared CNN Accuracy')
+        plt.plot(np.array([epoch]),
+                 np.array([loss_meter.avg]),
+                 'go-',
+                 label='Shared CNN Loss')
+        plt.legend()
+        plt.title('Shared CNN')
+        plt.xlabel('Iteration')
+        plt.savefig("child_training_curve.png")
+        # plt.show()
+
+        # vis_win['shared_cnn_loss'] = vis.line(
+        #     X=np.array([epoch]),
+        #     Y=np.array([loss_meter.avg]),
+        #     win=vis_win['shared_cnn_loss'],
+        #     opts=dict(title='shared_cnn_loss', xlabel='Iteration', ylabel='Loss'),
+        #     update='append' if epoch > 0 else None)
 
     controller.train()
 
@@ -115,6 +117,7 @@ def train_controller(epoch,
                      shared_cnn,
                      data_loaders,
                      controller_optimizer,
+                     args,
                      baseline=None):
     """Train controller to optimizer validation accuracy using REINFORCE.
     Args:
@@ -208,26 +211,29 @@ def train_controller(epoch,
                           '\ttime=%.2fit/s' % (1. / (end - start))
                 print(display)
 
-    plt.figure()
-    plt.plot(np.column_stack([epoch] * 2),
-             np.column_stack([reward_meter.avg, baseline_meter.avg]),
-             'go-',
-             label='Controller Reward')
+    if args["plots"]:
+        import matplotlib.pyplot as plt
 
-    plt.plot(np.array([epoch]),
-             np.array([val_acc_meter.avg]),
-             'ro-',
-             label='Controller Accuracy')
+        plt.figure()
+        plt.plot(np.column_stack([epoch] * 2),
+                 np.column_stack([reward_meter.avg, baseline_meter.avg]),
+                 'go-',
+                 label='Controller Reward')
 
-    plt.plot(np.array([epoch]),
-             np.array([loss_meter.avg]),
-             'bo-',
-             label='Controller Loss')
-    plt.legend()
-    plt.title('Controller')
-    plt.xlabel('Iteration')
-    plt.savefig("controller_training_curve.png")
-    # plt.show()
+        plt.plot(np.array([epoch]),
+                 np.array([val_acc_meter.avg]),
+                 'ro-',
+                 label='Controller Accuracy')
+
+        plt.plot(np.array([epoch]),
+                 np.array([loss_meter.avg]),
+                 'bo-',
+                 label='Controller Loss')
+        plt.legend()
+        plt.title('Controller')
+        plt.xlabel('Iteration')
+        plt.savefig("controller_training_curve.png")
+        # plt.show()
 
     # vis_win['controller_reward'] = vis.line(
     #     X=np.column_stack([epoch] * 2),
@@ -277,7 +283,7 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
                          shared_cnn_optimizer, args)
 
         baseline = train_controller(epoch, controller, shared_cnn,
-                                    data_loaders, controller_optimizer,
+                                    data_loaders, controller_optimizer, args,
                                     baseline)
 
         if epoch % args['eval_every_epochs'] == 0:
