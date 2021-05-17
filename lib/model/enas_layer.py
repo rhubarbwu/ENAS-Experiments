@@ -8,7 +8,8 @@ class ENASLayer(nn.Module):
     '''
     https://github.com/melodyguan/enas/blob/master/src/cifar10/general_child.py#L245
     '''
-    def __init__(self, layer_id, in_planes, out_planes):
+
+    def __init__(self, layer_id, in_planes, out_planes, set_branches):
         super(ENASLayer, self).__init__()
 
         self.layer_id = layer_id
