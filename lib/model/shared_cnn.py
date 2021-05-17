@@ -1,5 +1,6 @@
 from .enas_layer import ENASLayer
 from .spaces import spaces
+from ..hparams import args
 
 from .factorized_reduction import FactorizedReduction
 
@@ -9,6 +10,7 @@ from sys import argv
 
 arg = argv[1]
 set_func, pick_func = spaces[arg]
+args["space"] = arg
 
 
 class SharedCNN(nn.Module):

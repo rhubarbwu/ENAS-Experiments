@@ -21,5 +21,6 @@ To understand how this works in detail, read our paper attached above.
 _These are the versions we used but lower versions might work as well._
 
 - `matplotlib` 3.3.4
+- `pandas`
 - `python` 3.8.8
 - `pytorch` 1.8.1

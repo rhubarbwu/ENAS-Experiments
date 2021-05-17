@@ -1,9 +1,13 @@
 from .model.average_meter import AverageMeter
 from .eval import evaluate_model
+from .hparams import args
 
 from time import time
 import torch
 from torch import nn
+import numpy as np
+import pandas as pd
+from datetime import datetime
 
 
 def train_shared_cnn(epoch,
@@ -38,6 +42,8 @@ def train_shared_cnn(epoch,
     train_acc_meter = AverageMeter()
     loss_meter = AverageMeter()
 
+    log_every = args["log_every"]
+
     for i, (images, labels) in enumerate(train_loader):
         start = time()
         images = images.cuda()
@@ -67,7 +73,7 @@ def train_shared_cnn(epoch,
 
         end = time()
 
-        if (i) % args['log_every'] == 0:
+        if log_every and (i % args['log_every'] == 0):
             learning_rate = shared_cnn_optimizer.param_groups[0]['lr']
             display = 'epoch=' + str(epoch) + \
                       '\tch_step=' + str(i) + \
@@ -77,38 +83,6 @@ def train_shared_cnn(epoch,
                       '\tacc=%.4f' % (train_acc_meter.val) + \
                       '\ttime=%.2fit/s' % (1. / (end - start))
             print(display)
-
-    # vis_win['shared_cnn_acc'] = vis.line(
-    #     X=np.array([epoch]),
-    #     Y=np.array([train_acc_meter.avg]),
-    #     win=vis_win['shared_cnn_acc'],
-    #     opts=dict(title='shared_cnn_acc', xlabel='Iteration', ylabel='Accuracy'),
-    #     update='append' if epoch > 0 else None)
-
-    if args["plots"]:
-        import matplotlib.pyplot as plt
-
-        plt.figure()
-        plt.plot(np.array([epoch]),
-                 np.array([train_acc_meter.avg]),
-                 'ro-',
-                 label='Shared CNN Accuracy')
-        plt.plot(np.array([epoch]),
-                 np.array([loss_meter.avg]),
-                 'go-',
-                 label='Shared CNN Loss')
-        plt.legend()
-        plt.title('Shared CNN')
-        plt.xlabel('Iteration')
-        plt.savefig("child_training_curve.png")
-        # plt.show()
-
-        # vis_win['shared_cnn_loss'] = vis.line(
-        #     X=np.array([epoch]),
-        #     Y=np.array([loss_meter.avg]),
-        #     win=vis_win['shared_cnn_loss'],
-        #     opts=dict(title='shared_cnn_loss', xlabel='Iteration', ylabel='Loss'),
-        #     update='append' if epoch > 0 else None)
 
     controller.train()
 
@@ -195,14 +169,14 @@ def train_controller(epoch,
 
         # Aggregate gradients for controller_num_aggregate iterationa, then update weights
         if (i + 1) % args['controller_num_aggregate'] == 0:
-            grad_norm = torch.nn.utils.clip_grad_norm_(
-                controller.parameters(), args['child_grad_bound'])
+            grad_norm = torch.nn.utils.clip_grad_norm_(controller.parameters(),
+                                                       args['child_grad_bound'])
             controller_optimizer.step()
             controller.zero_grad()
 
             if (i + 1) % (2 * args['controller_num_aggregate']) == 0:
                 learning_rate = controller_optimizer.param_groups[0]['lr']
-                display = 'ctrl_step=' + str(i // args['controller_num_aggregate']) + \
+                display = 'ctrl_step=' + str(i) + \
                           '\tloss=%.3f' % (loss_meter.val) + \
                           '\tent=%.2f' % (controller.sample_entropy.item()) + \
                           '\tlr=%.4f' % (learning_rate) + \
@@ -212,58 +186,13 @@ def train_controller(epoch,
                           '\ttime=%.2fit/s' % (1. / (end - start))
                 print(display)
 
-    if args["plots"]:
-        import matplotlib.pyplot as plt
-
-        plt.figure()
-        plt.plot(np.column_stack([epoch] * 2),
-                 np.column_stack([reward_meter.avg, baseline_meter.avg]),
-                 'go-',
-                 label='Controller Reward')
-
-        plt.plot(np.array([epoch]),
-                 np.array([val_acc_meter.avg]),
-                 'ro-',
-                 label='Controller Accuracy')
-
-        plt.plot(np.array([epoch]),
-                 np.array([loss_meter.avg]),
-                 'bo-',
-                 label='Controller Loss')
-        plt.legend()
-        plt.title('Controller')
-        plt.xlabel('Iteration')
-        plt.savefig("controller_training_curve.png")
-        # plt.show()
-
-    # vis_win['controller_reward'] = vis.line(
-    #     X=np.column_stack([epoch] * 2),
-    #     Y=np.column_stack([reward_meter.avg, baseline_meter.avg]),
-    #     win=vis_win['controller_reward'],
-    #     opts=dict(title='controller_reward', xlabel='Iteration', ylabel='Reward'),
-    #     update='append' if epoch > 0 else None)
-
-    # vis_win['controller_acc'] = vis.line(
-    #     X=np.array([epoch]),
-    #     Y=np.array([val_acc_meter.avg]),
-    #     win=vis_win['controller_acc'],
-    #     opts=dict(title='controller_acc', xlabel='Iteration', ylabel='Accuracy'),
-    #     update='append' if epoch > 0 else None)
-
-    # vis_win['controller_loss'] = vis.line(
-    #     X=np.array([epoch]),
-    #     Y=np.array([loss_meter.avg]),
-    #     win=vis_win['controller_loss'],
-    #     opts=dict(title='controller_loss', xlabel='Iteration', ylabel='Loss'),
-    #     update='append' if epoch > 0 else None)
-
     shared_cnn.train()
-    return baseline
+    return baseline, (reward_meter.avg, reward_meter[len(reward_meter) - 1])
 
 
 def train_enas(start_epoch, controller, shared_cnn, data_loaders,
-               shared_cnn_optimizer, controller_optimizer,
-               shared_cnn_scheduler, args):
+               shared_cnn_optimizer, controller_optimizer, shared_cnn_scheduler,
+               args):
     """Perform architecture search by training a controller and shared_cnn.
     Args:
         start_epoch: Epoch to begin on.
@@ -278,17 +207,26 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
     """
 
     baseline = None
+
+    val_accs, test_accs, reward_avgs, reward_finals = [], [], [], []
+
     for epoch in range(start_epoch, args['num_epochs']):
 
         train_shared_cnn(epoch, controller, shared_cnn, data_loaders,
                          shared_cnn_optimizer, args)
 
-        baseline = train_controller(epoch, controller, shared_cnn,
-                                    data_loaders, controller_optimizer, args,
-                                    baseline)
+        baseline, reward_vals = train_controller(epoch, controller, shared_cnn,
+                                                 data_loaders,
+                                                 controller_optimizer, args,
+                                                 baseline)
 
         if epoch % args['eval_every_epochs'] == 0:
-            evaluate_model(epoch, controller, shared_cnn, data_loaders)
+            val_acc, test_acc = evaluate_model(epoch, controller, shared_cnn,
+                                               data_loaders)
+            val_accs.append(val_acc)
+            test_accs.append(test_acc)
+            reward_avgs.append(reward_vals[0])
+            reward_finals.append(reward_vals[1])
 
         # shared_cnn_scheduler.step(epoch)
         shared_cnn_scheduler.step()
@@ -303,6 +241,15 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
         }
         filename = args['output_filename'] + '.pth.tar'
         torch.save(state, filename)
+
+    metrics = pd.DataFrame({
+        "val": np.array(val_acc),
+        "test": np.array(test_acc),
+        "reward_avg": np.array(reward_avgs),
+        "reward_finals": np.array(reward_finals),
+    })
+    metrics.to_csv("experiments/{}_{}".format(args["space"], datetime.now()),
+                   index=False)
 
 
 def train_fixed(start_epoch, controller, shared_cnn, data_loaders):
@@ -376,3 +323,5 @@ def train_fixed(start_epoch, controller, shared_cnn, data_loaders):
         }
         filename = args['output_filename'] + '_fixed.pth.tar'
         torch.save(state, filename)
+
+    return {}

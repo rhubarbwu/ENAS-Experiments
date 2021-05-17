@@ -36,6 +36,7 @@ def evaluate_model(epoch, controller, shared_cnn, data_loaders, n_samples=10):
 
     controller.train()
     shared_cnn.train()
+    return valid_acc, test_acc
 
 
 def get_best_arc(controller,
