@@ -2,6 +2,7 @@ from torch import nn
 
 
 class SeparableConv(nn.Module):
+
     def __init__(self, in_planes, out_planes, kernel_size, bias):
         super(SeparableConv, self).__init__()
         padding = (kernel_size - 1) // 2

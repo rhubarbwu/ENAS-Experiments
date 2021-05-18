@@ -2,12 +2,12 @@ from .model.average_meter import AverageMeter
 from .eval import evaluate_model
 from .hparams import args
 
+from datetime import datetime
+import pandas as pd
+import numpy as np
 from time import time
 import torch
 from torch import nn
-import numpy as np
-import pandas as pd
-from datetime import datetime
 
 
 def train_shared_cnn(epoch,
@@ -187,7 +187,7 @@ def train_controller(epoch,
                 print(display)
 
     shared_cnn.train()
-    return baseline, (reward_meter.avg, reward_meter[len(reward_meter) - 1])
+    return baseline, (reward_meter.avg, reward)
 
 
 def train_enas(start_epoch, controller, shared_cnn, data_loaders,

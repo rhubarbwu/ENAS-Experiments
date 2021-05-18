@@ -8,6 +8,7 @@ class Controller(nn.Module):
     '''
     https://github.com/melodyguan/enas/blob/master/src/cifar10/general_controller.py
     '''
+
     def __init__(self,
                  search_for="macro",
                  search_whole_channels=True,
@@ -46,8 +47,7 @@ class Controller(nn.Module):
                               hidden_size=self.lstm_size,
                               num_layers=self.lstm_num_layers)
 
-        self.g_emb = nn.Embedding(1,
-                                  self.lstm_size)  # Learn the starting input
+        self.g_emb = nn.Embedding(1, self.lstm_size)  # Learn the starting input
 
         if self.search_whole_channels:
             self.w_emb = nn.Embedding(self.num_branches, self.lstm_size)

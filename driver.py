@@ -12,8 +12,6 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 np.random.seed(args['seed'])
 torch.cuda.manual_seed(args['seed'])
 
-# print("\n".join("{}\t{}".format(k, v) for k, v in args.items()))
-
 data_loaders = load_datasets(args)
 
 controller = Controller(search_for=args['search_for'],
@@ -63,10 +61,8 @@ if args['resume']:
         print(checkpoint.keys())
         shared_cnn.load_state_dict(checkpoint['shared_cnn_state_dict'])
         controller.load_state_dict(checkpoint['controller_state_dict'])
-        shared_cnn_optimizer.load_state_dict(
-            checkpoint['shared_cnn_optimizer'])
-        controller_optimizer.load_state_dict(
-            checkpoint['controller_optimizer'])
+        shared_cnn_optimizer.load_state_dict(checkpoint['shared_cnn_optimizer'])
+        controller_optimizer.load_state_dict(checkpoint['controller_optimizer'])
         shared_cnn_scheduler.optimizer = shared_cnn_optimizer  # Not sure if this actually works
         print("Loaded checkpoint '{}' (epoch {})".format(
             args['resume'], checkpoint['epoch']))
@@ -77,8 +73,8 @@ else:
 
 if not args['fixed_arc']:
     train_enas(start_epoch, controller, shared_cnn, data_loaders,
-               shared_cnn_optimizer, controller_optimizer,
-               shared_cnn_scheduler, args)
+               shared_cnn_optimizer, controller_optimizer, shared_cnn_scheduler,
+               args)
 else:
     assert args[
         'resume'] != '', 'A pretrained model should be used when training a fixed architecture.'

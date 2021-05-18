@@ -9,12 +9,12 @@ class FactorizedReduction(nn.Module):
     potentially to change the number of output filters
     https://github.com/melodyguan/enas/blob/master/src/cifar10/general_child.py#L129
     '''
+
     def __init__(self, in_planes, out_planes, stride=2):
         super(FactorizedReduction, self).__init__()
 
         assert out_planes % 2 == 0, (
-            "Need even number of filters when using this factorized reduction."
-        )
+            "Need even number of filters when using this factorized reduction.")
 
         self.in_planes = in_planes
         self.out_planes = out_planes
@@ -27,16 +27,12 @@ class FactorizedReduction(nn.Module):
         else:
             self.path1 = nn.Sequential(
                 nn.AvgPool2d(1, stride=stride),
-                nn.Conv2d(in_planes,
-                          out_planes // 2,
-                          kernel_size=1,
+                nn.Conv2d(in_planes, out_planes // 2, kernel_size=1,
                           bias=False))
 
             self.path2 = nn.Sequential(
                 nn.AvgPool2d(1, stride=stride),
-                nn.Conv2d(in_planes,
-                          out_planes // 2,
-                          kernel_size=1,
+                nn.Conv2d(in_planes, out_planes // 2, kernel_size=1,
                           bias=False))
             self.bn = nn.BatchNorm2d(out_planes, track_running_stats=False)
 
