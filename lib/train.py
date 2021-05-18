@@ -226,7 +226,7 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
             val_accs.append(val_acc)
             test_accs.append(test_acc)
             reward_avgs.append(reward_vals[0])
-            reward_finals.append(reward_vals[1])
+            reward_finals.append(reward_vals[1].detach().cpu())
 
         # shared_cnn_scheduler.step(epoch)
         shared_cnn_scheduler.step()
