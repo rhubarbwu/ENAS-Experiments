@@ -7,9 +7,10 @@ class ConvBranch(nn.Module):
     '''
     https://github.com/melodyguan/enas/blob/master/src/cifar10/general_child.py#L483
     '''
+
     def __init__(self, in_planes, out_planes, kernel_size, separable=False):
         super(ConvBranch, self).__init__()
-        assert kernel_size in [3, 5], "Kernel size must be either 3 or 5"
+        # assert kernel_size in [3, 5], "Kernel size must be either 3 or 5"
 
         self.in_planes = in_planes
         self.out_planes = out_planes
