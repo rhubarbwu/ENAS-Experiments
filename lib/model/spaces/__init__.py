@@ -1,8 +1,8 @@
-from . import space_0, space_1, space_2, space_3
+from . import space_00, space_01, space_02, space_03
 
 spaces = {
-    "0": space_0.functions,
-    "1": space_1.functions,
-    "2": space_2.functions,
-    "3": space_3.functions
+    "00": space_00.functions,
+    "01": space_01.functions,
+    "02": space_02.functions,
+    "03": space_03.functions
 }

@@ -1,3 +1,5 @@
 export
 __pycache__/
+*.log
 *.pyc
+*.tar
