@@ -1,6 +1,8 @@
 from ..conv_branch import ConvBranch
 from ..pool_branch import PoolBranch
 
+n_branches = 7
+
 
 def set_func(layer, in_planes, out_planes):
 
@@ -18,8 +20,6 @@ def set_func(layer, in_planes, out_planes):
     layer.branch_5 = PoolBranch(in_planes, out_planes, 'max')
 
     layer.branch_6 = ConvBranch(in_planes, out_planes, kernel_size=7)
-
-    n_branches = 6
 
     return n_branches
 

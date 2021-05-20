@@ -243,8 +243,8 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
         torch.save(state, filename)
 
     metrics = pd.DataFrame({
-        "val": np.array(val_acc),
-        "test": np.array(test_acc),
+        "val": np.array(val_accs),
+        "test": np.array(test_accs),
         "reward_avg": np.array(reward_avgs),
         "reward_finals": np.array(reward_finals),
     })

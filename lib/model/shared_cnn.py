@@ -7,7 +7,6 @@ from .factorized_reduction import FactorizedReduction
 from torch import nn
 
 from sys import argv
-
 arg = argv[1]
 set_func, pick_func = spaces[arg]
 args["space"] = arg

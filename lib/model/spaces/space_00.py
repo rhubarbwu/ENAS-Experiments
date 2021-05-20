@@ -1,6 +1,8 @@
 from ..conv_branch import ConvBranch
 from ..pool_branch import PoolBranch
 
+n_branches = 6
+
 
 def set_func(layer, in_planes, out_planes):
 
@@ -16,8 +18,6 @@ def set_func(layer, in_planes, out_planes):
                                 separable=True)
     layer.branch_4 = PoolBranch(in_planes, out_planes, 'avg')
     layer.branch_5 = PoolBranch(in_planes, out_planes, 'max')
-
-    n_branches = 6
 
     return n_branches
 

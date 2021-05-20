@@ -3,6 +3,7 @@ from lib.hparams import args
 from lib.model.controller import Controller
 from lib.model.shared_cnn import SharedCNN
 from lib.train import train_enas, train_fixed
+from lib.model.spaces import ns_branches
 
 import numpy as np
 from os.path import isfile
@@ -13,6 +14,10 @@ np.random.seed(args['seed'])
 torch.cuda.manual_seed(args['seed'])
 
 data_loaders = load_datasets(args)
+
+from sys import argv
+arg = argv[1]
+args["child_num_branches"] = ns_branches[arg]
 
 controller = Controller(search_for=args['search_for'],
                         search_whole_channels=True,

@@ -1,6 +1,8 @@
 from ..conv_branch import ConvBranch
 from ..pool_branch import PoolBranch
 
+n_branches = 7
+
 
 def set_func(layer, in_planes, out_planes):
 
@@ -21,8 +23,6 @@ def set_func(layer, in_planes, out_planes):
                                 out_planes,
                                 kernel_size=7,
                                 separable=True)
-
-    n_branches = 6
 
     return n_branches
 
