@@ -8,7 +8,7 @@ args = {
     "output_filename": "ENAS",
     "resume": "",
     "batch_size": 128,
-    "num_epochs": 30,
+    "num_epochs": 300,
     "eval_every_epochs": 1,
     "seed": 69,
     "cutout": 0,

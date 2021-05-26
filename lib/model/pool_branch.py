@@ -6,8 +6,11 @@ class PoolBranch(nn.Module):
     '''
     https://github.com/melodyguan/enas/blob/master/src/cifar10/general_child.py#L546
     '''
-
-    def __init__(self, in_planes, out_planes, avg_or_max):
+    def __init__(self,
+                 in_planes,
+                 out_planes,
+                 avg_or_max,
+                 return_indices=False):
         super(PoolBranch, self).__init__()
 
         self.in_planes = in_planes
@@ -21,7 +24,10 @@ class PoolBranch(nn.Module):
         if avg_or_max == 'avg':
             self.pool = torch.nn.AvgPool2d(kernel_size=3, stride=1, padding=1)
         elif avg_or_max == 'max':
-            self.pool = torch.nn.MaxPool2d(kernel_size=3, stride=1, padding=1)
+            self.pool = torch.nn.MaxPool2d(kernel_size=3,
+                                           stride=1,
+                                           padding=1,
+                                           return_indices=return_indices)
         else:
             raise ValueError("Unknown pool {}".format(avg_or_max))
 

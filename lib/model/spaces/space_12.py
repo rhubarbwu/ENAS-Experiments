@@ -3,7 +3,7 @@ from ..pool_branch import PoolBranch
 
 from torch.nn import ConvTranspose2d
 
-n_branches = 18
+n_branches = 46
 
 
 def set_func(layer, in_planes, out_planes):
@@ -48,9 +48,9 @@ def pick_func(layer, layer_type, x):
         out = layer.branch_4(x)
     elif layer_type == 5:
         out = layer.branch_5(x)
-    elif 6 <= layer_type < 12:
+    elif 6 <= layer_type < 26:
         out = layer.branch_6(x)
-    elif 12 <= layer_type < 18:
+    elif 26 <= layer_type < 46:
         out = layer.branch_7(x)
 
     return out
