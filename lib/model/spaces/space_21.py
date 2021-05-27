@@ -3,7 +3,7 @@ from ..pool_branch import PoolBranch
 
 from torch.nn import Identity
 
-n_branches = 12
+n_branches = 42
 
 
 def set_func(layer, in_planes, out_planes):
@@ -39,7 +39,7 @@ def pick_func(layer, layer_type, x):
         out = layer.branch_4(x)
     elif layer_type == 5:
         out = layer.branch_5(x)
-    elif 6 <= layer_type < 12:
+    elif 6 <= layer_type < 42:
         out = layer.branch_6(x)
 
     return out
