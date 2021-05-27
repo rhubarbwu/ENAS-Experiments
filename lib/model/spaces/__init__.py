@@ -1,4 +1,4 @@
-from . import space_00, space_01, space_02, space_03, space_10, space_11, space_12, space_13
+from . import space_00, space_01, space_02, space_03, space_10, space_11, space_12, space_13, space_20
 
 spaces = {
     "00": space_00.functions,
@@ -8,7 +8,8 @@ spaces = {
     "10": space_10.functions,
     "11": space_11.functions,
     "12": space_12.functions,
-    "13": space_13.functions
+    "13": space_13.functions,
+    "20": space_20.functions
 }
 
 ns_branches = {
@@ -19,5 +20,6 @@ ns_branches = {
     "10": space_10.n_branches,
     "11": space_11.n_branches,
     "12": space_12.n_branches,
-    "13": space_13.n_branches
+    "13": space_13.n_branches,
+    "20": space_20.n_branches
 }

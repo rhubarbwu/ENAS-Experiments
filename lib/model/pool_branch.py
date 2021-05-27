@@ -6,11 +6,8 @@ class PoolBranch(nn.Module):
     '''
     https://github.com/melodyguan/enas/blob/master/src/cifar10/general_child.py#L546
     '''
-    def __init__(self,
-                 in_planes,
-                 out_planes,
-                 avg_or_max,
-                 return_indices=False):
+
+    def __init__(self, in_planes, out_planes, avg_or_max, return_indices=False):
         super(PoolBranch, self).__init__()
 
         self.in_planes = in_planes
