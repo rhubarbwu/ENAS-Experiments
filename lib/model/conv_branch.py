@@ -8,7 +8,13 @@ class ConvBranch(nn.Module):
     https://github.com/melodyguan/enas/blob/master/src/cifar10/general_child.py#L483
     '''
 
-    def __init__(self, in_planes, out_planes, kernel_size, separable=False):
+    def __init__(self,
+                 in_planes,
+                 out_planes,
+                 kernel_size,
+                 separable=False,
+                 dilation=1,
+                 extra_padding=0):
         super(ConvBranch, self).__init__()
         # assert kernel_size in [3, 5], "Kernel size must be either 3 or 5"
 
@@ -18,7 +24,11 @@ class ConvBranch(nn.Module):
         self.separable = separable
 
         self.inp_conv1 = nn.Sequential(
-            nn.Conv2d(in_planes, out_planes, kernel_size=1, bias=False),
+            nn.Conv2d(in_planes,
+                      out_planes,
+                      kernel_size=1,
+                      bias=False,
+                      dilation=dilation),
             nn.BatchNorm2d(out_planes, track_running_stats=False), nn.ReLU())
 
         if separable:
@@ -30,13 +40,14 @@ class ConvBranch(nn.Module):
                 nn.BatchNorm2d(out_planes, track_running_stats=False),
                 nn.ReLU())
         else:
-            padding = (kernel_size - 1) // 2
+            padding = (kernel_size - 1) // 2 + extra_padding
             self.out_conv = nn.Sequential(
                 nn.Conv2d(in_planes,
                           out_planes,
                           kernel_size=kernel_size,
                           padding=padding,
-                          bias=False),
+                          bias=False,
+                          dilation=dilation),
                 nn.BatchNorm2d(out_planes, track_running_stats=False),
                 nn.ReLU())
 
