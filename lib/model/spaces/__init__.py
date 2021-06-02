@@ -1,7 +1,7 @@
 from . import space_0A, space_0B, space_0C, space_0D
 from . import space_1A, space_1B, space_1C, space_1D
 from . import space_2A, space_2B, space_2C, space_2D
-# from . import space_3A, space_3B, space_3C, space_3D
+from . import space_3A, space_3B, space_3C, space_3D
 from . import space_9A, space_9B, space_9C, space_9D, space_9E, space_9F, space_9G
 
 spaces = {
@@ -17,10 +17,10 @@ spaces = {
     "2B": space_2B.functions,
     "2C": space_2C.functions,
     "2D": space_2D.functions,
-    # "3A": space_3A.functions,
-    # "3B": space_3B.functions,
-    # "3C": space_3C.functions,
-    # "3D": space_3D.functions,
+    "3A": space_3A.functions,
+    "3B": space_3B.functions,
+    "3C": space_3C.functions,
+    "3D": space_3D.functions,
     "9A": space_9A.functions,
     "9B": space_9B.functions,
     "9C": space_9C.functions,
@@ -43,10 +43,10 @@ ns_branches = {
     "2B": space_2B.n_branches,
     "2C": space_2C.n_branches,
     "2D": space_2D.n_branches,
-    # "3A": space_3A.n_branches,
-    # "3B": space_3B.n_branches,
-    # "3C": space_3C.n_branches,
-    # "3D": space_3D.n_branches,
+    "3A": space_3A.n_branches,
+    "3B": space_3B.n_branches,
+    "3C": space_3C.n_branches,
+    "3D": space_3D.n_branches,
     "9A": space_9A.n_branches,
     "9B": space_9B.n_branches,
     "9C": space_9C.n_branches,
