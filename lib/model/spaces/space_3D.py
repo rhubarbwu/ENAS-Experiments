@@ -1,5 +1,6 @@
 from ..conv_branch import ConvBranch
 from ..pool_branch import PoolBranch
+from ...hparams import args
 
 from torch.nn import Dropout
 
@@ -21,7 +22,7 @@ def set_func(layer, in_planes, out_planes):
     layer.branch_4 = PoolBranch(in_planes, out_planes, 'avg')
     layer.branch_5 = PoolBranch(in_planes, out_planes, 'max')
 
-    layer.branch_6 = Dropout(.9)
+    layer.branch_6 = Dropout(args["dropout_rate"])
 
     return n_branches
 

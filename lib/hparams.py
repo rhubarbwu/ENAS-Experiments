@@ -42,5 +42,8 @@ args = {
     "controller_bl_dec": 0.99,
 
     # search space
-    "space": -1
+    "space": -1,
+
+    # dropout
+    "dropout_rate": .9
 }
