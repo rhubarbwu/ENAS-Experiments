@@ -1,3 +1,26 @@
+# ENAS Experiments
+
+This codebase has been adapted to run experiments on improving/evaluating the robustness of the ENAS algorithm.
+
+## Requirements
+
+_These are the versions we used but lower versions might work as well._
+
+- `matplotlib` 3.3.4
+- `pandas`
+- `python` 3.8.8
+- `pytorch` 1.8.1
+
+## Setup
+
+Prepare the experiments in `./lib/model/spaces` by copying `spaces_example.py` and adding new branches. Alternatively you can run `fetch-spaces.sh` to download experiment sets.
+
+```sh
+sh fetch-spaces.sh git@github.com:rusbridger/ENAS-poisoning.git
+```
+
+---
+
 # Experimentally Assessing the Controllers for Neural Architecture Search
 
 Neural networks are powerful and flexible models that work well for many complicated tasks such as computer vision, text & speech processing, combinatorial optimization problems, etc. “AI that creates AI”, was a common headline of what people initially described as Automated Machine Learning (i.e. Auto ML). This novel concept gained attraction in 2016 when Google Brain released their first “Neural Architecture Search with Reinforcement Learning (NAS)”. Traditionally, choosing a neural network architecture manually is a tiring, inefficient & computationally expensive task. Even the standard NAS is very computationally expensive as it required over 450 GPU’s for 3-4 days to train on CIFAR-10. We are analyzing & reproducing the method of standard Neural Architecture Search (NAS) through an existing improved method known as “Efficient Neural Architecture Search via Parameter Sharing (ENAS)”. We are assessing the quality of the ENAS architectures’ RNN controller using different experimental techniques such as search space poisoning and random search to see how the controller performs when decoupled with strong search spaces.
@@ -15,12 +38,3 @@ Neural networks are powerful and flexible models that work well for many complic
 ### This is essentially training a Neural Network to produce a Neural Network. Creating AI which further creates AI!
 
 To understand how this works in detail, read our paper attached above.
-
-## Requirements
-
-_These are the versions we used but lower versions might work as well._
-
-- `matplotlib` 3.3.4
-- `pandas`
-- `python` 3.8.8
-- `pytorch` 1.8.1

@@ -1,4 +1,5 @@
 export
+lib/model/spaces
 __pycache__/
 *.log
 *.pyc
