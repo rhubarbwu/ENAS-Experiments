@@ -5,7 +5,6 @@ class ENASLayer(nn.Module):
     '''
     https://github.com/melodyguan/enas/blob/master/src/cifar10/general_child.py#L245
     '''
-
     def __init__(self, layer_id, in_planes, out_planes, set_func, pick_func):
         super(ENASLayer, self).__init__()
 

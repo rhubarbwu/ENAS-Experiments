@@ -1,23 +1,21 @@
 from ..conv_branch import ConvBranch
 from ..pool_branch import PoolBranch
 
-n_branches = 6
+n_branches = 4
 
 
 def set_func(layer, in_planes, out_planes):
 
-    layer.branch_0 = ConvBranch(in_planes, out_planes, kernel_size=3)
-    layer.branch_1 = ConvBranch(in_planes,
+    layer.branch_0 = ConvBranch(in_planes,
                                 out_planes,
                                 kernel_size=3,
-                                separable=True)
-    layer.branch_2 = ConvBranch(in_planes, out_planes, kernel_size=5)
-    layer.branch_3 = ConvBranch(in_planes,
+                                padding=1)
+    layer.branch_1 = ConvBranch(in_planes,
                                 out_planes,
                                 kernel_size=5,
-                                separable=True)
-    layer.branch_4 = PoolBranch(in_planes, out_planes, 'avg')
-    layer.branch_5 = PoolBranch(in_planes, out_planes, 'max')
+                                padding=2)
+    layer.branch_2 = PoolBranch(in_planes, out_planes, 'avg')
+    layer.branch_3 = PoolBranch(in_planes, out_planes, 'max')
 
     return n_branches
 
@@ -31,10 +29,6 @@ def pick_func(layer, layer_type, x):
         out = layer.branch_2(x)
     elif layer_type == 3:
         out = layer.branch_3(x)
-    elif layer_type == 4:
-        out = layer.branch_4(x)
-    elif layer_type == 5:
-        out = layer.branch_5(x)
 
     return out
 

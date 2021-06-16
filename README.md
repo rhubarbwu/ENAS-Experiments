@@ -13,10 +13,17 @@ _These are the versions we used but lower versions might work as well._
 
 ## Setup
 
-Prepare the experiments in `./lib/model/spaces` by copying `spaces_example.py` and adding new branches. Alternatively you can run `fetch-spaces.sh` to download experiment sets.
+Prepare the experiments in `./lib/model/spaces` by running `fetch-spaces.sh`.
 
 ```sh
+# default ENAS experiment set
+sh fetch-spaces.sh
+
+# poisoning ENAS experiment set
 sh fetch-spaces.sh git@github.com:rusbridger/ENAS-poisoning.git
+
+# typed ENAS experiment set
+sh fetch-spaces.sh git@github.com:rusbridger/ENAS-types.git
 ```
 
 ---
