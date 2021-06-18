@@ -11,7 +11,6 @@ class ConvBranch(nn.Module):
                  in_planes,
                  out_planes,
                  kernel_size,
-                 separable=False,
                  padding=0,
                  dilation=1,
                  stride=1):

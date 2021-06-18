@@ -77,13 +77,13 @@ def get_best_arc(controller,
 
         with torch.no_grad():
             pred = shared_cnn(images, sample_arc)
-        val_acc = torch.mean((torch.max(pred,
-                                        1)[1] == labels).type(torch.float))
-        val_accs.append(val_acc.item())
+        val_acc = torch.mean(
+            (torch.max(pred, 1)[1] == labels).type(torch.float)).cpu().numpy()
+        val_accs.append(val_acc)
 
         if verbose:
             print_arc(sample_arc)
-            print('val_acc=' + str(val_acc.item()))
+            print('val_acc=' + str(val_acc))
             print('-' * 80)
 
     best_iter = np.argmax(val_accs)
@@ -118,7 +118,7 @@ def get_eval_accuracy(loader, shared_cnn, sample_arc):
         total += pred.shape[0]
 
     acc = acc_sum / total
-    return acc.item()
+    return acc
 
 
 def print_arc(sample_arc):

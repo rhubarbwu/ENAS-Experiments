@@ -34,7 +34,7 @@ class FixedLayer(nn.Module):
             raise ValueError("Unknown layer_type {}".format(self.layer_type))
 
         # Use concatentation instead of addition in the fixed layer for some reason
-        in_planes = int((torch.sum(self.skip_indices).item() + 1) * in_planes)
+        in_planes = int((torch.sum(self.skip_indices) + 1) * in_planes)
         self.dim_reduc = nn.Sequential(
             nn.Conv2d(in_planes, out_planes, kernel_size=1, bias=False),
             nn.ReLU(), nn.BatchNorm2d(out_planes, track_running_stats=False))

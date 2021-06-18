@@ -68,8 +68,8 @@ def train_shared_cnn(epoch,
         train_acc = torch.mean((torch.max(pred,
                                           1)[1] == labels).type(torch.float))
 
-        train_acc_meter.update(train_acc.item())
-        loss_meter.update(loss.item())
+        train_acc_meter.update(train_acc)
+        loss_meter.update(loss)
 
         end = time()
 
@@ -79,7 +79,7 @@ def train_shared_cnn(epoch,
                       '\tch_step=' + str(i) + \
                       '\tloss=%.6f' % (loss_meter.val) + \
                       '\tlr=%.4f' % (learning_rate) + \
-                      '\t|g|=%.4f' % (grad_norm.item()) + \
+                      '\t|g|=%.4f' % (grad_norm) + \
                       '\tacc=%.4f' % (train_acc_meter.val) + \
                       '\ttime=%.2fit/s' % (1. / (end - start))
             print(display)
@@ -155,10 +155,10 @@ def train_controller(epoch,
         if args['controller_skip_weight'] is not None:
             loss += args['controller_skip_weight'] * controller.skip_penaltys
 
-        reward_meter.update(reward.item())
-        baseline_meter.update(baseline.item())
-        val_acc_meter.update(val_acc.item())
-        loss_meter.update(loss.item())
+        reward_meter.update(reward)
+        baseline_meter.update(baseline)
+        val_acc_meter.update(val_acc)
+        loss_meter.update(loss)
 
         # Average gradient over controller_num_aggregate samples
         loss = loss / args['controller_num_aggregate']
@@ -178,9 +178,9 @@ def train_controller(epoch,
                 learning_rate = controller_optimizer.param_groups[0]['lr']
                 display = 'ctrl_step=' + str(i) + \
                           '\tloss=%.3f' % (loss_meter.val) + \
-                          '\tent=%.2f' % (controller.sample_entropy.item()) + \
+                          '\tent=%.2f' % (controller.sample_entropy) + \
                           '\tlr=%.4f' % (learning_rate) + \
-                          '\t|g|=%.4f' % (grad_norm.item()) + \
+                          '\t|g|=%.4f' % (grad_norm) + \
                           '\tacc=%.4f' % (val_acc_meter.val) + \
                           '\tbl=%.2f' % (baseline_meter.val) + \
                           '\ttime=%.2fit/s' % (1. / (end - start))

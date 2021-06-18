@@ -43,7 +43,4 @@ args = {
 
     # search space
     "space": -1,
-
-    # dropout
-    "dropout_rate": .9
 }
