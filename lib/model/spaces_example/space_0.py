@@ -6,14 +6,8 @@ n_branches = 4
 
 def set_func(layer, in_planes, out_planes):
 
-    layer.branch_0 = ConvBranch(in_planes,
-                                out_planes,
-                                kernel_size=3,
-                                padding=1)
-    layer.branch_1 = ConvBranch(in_planes,
-                                out_planes,
-                                kernel_size=5,
-                                padding=2)
+    layer.branch_0 = ConvBranch(in_planes, out_planes, kernel_size=3, padding=1)
+    layer.branch_1 = ConvBranch(in_planes, out_planes, kernel_size=5, padding=2)
     layer.branch_2 = PoolBranch(in_planes, out_planes, 'avg')
     layer.branch_3 = PoolBranch(in_planes, out_planes, 'max')
 
@@ -31,6 +25,3 @@ def pick_func(layer, layer_type, x):
         out = layer.branch_3(x)
 
     return out
-
-
-functions = (set_func, pick_func)

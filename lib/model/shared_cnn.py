@@ -1,20 +1,18 @@
 from .enas_layer import ENASLayer
-from .spaces import spaces
+from .factorized_reduction import FactorizedReduction
 from ..hparams import args
 
-from .factorized_reduction import FactorizedReduction
-
+from sys import argv
 from torch import nn
 
-from sys import argv
 arg = argv[1]
-set_func, pick_func = spaces[arg]
 args["space"] = arg
 
 
 class SharedCNN(nn.Module):
 
     def __init__(self,
+                 experiment,
                  num_layers=12,
                  num_branches=6,
                  out_filters=24,
@@ -42,7 +40,7 @@ class SharedCNN(nn.Module):
         for layer_id in range(self.num_layers):
             if self.fixed_arc is None:
                 layer = ENASLayer(layer_id, self.out_filters, self.out_filters,
-                                  set_func, pick_func)
+                                  experiment.set_func, experiment.pick_func)
 
             else:
                 layer = FixedLayer(layer_id, self.out_filters, self.out_filters,

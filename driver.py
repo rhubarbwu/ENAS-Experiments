@@ -3,7 +3,6 @@ from lib.hparams import args
 from lib.model.controller import Controller
 from lib.model.shared_cnn import SharedCNN
 from lib.train import train_enas, train_fixed
-from lib.model.spaces import ns_branches
 
 import numpy as np
 from os.path import isfile
@@ -16,14 +15,15 @@ torch.cuda.manual_seed(args['seed'])
 data_loaders = load_datasets(args)
 
 from sys import argv
+from importlib import import_module
 
 arg = argv[1]
-n_branches = ns_branches[arg]
+experiment = import_module("lib.model.spaces.{}".format(arg))
 
 controller = Controller(search_for=args['search_for'],
                         search_whole_channels=True,
                         num_layers=args['child_num_layers'],
-                        num_branches=n_branches,
+                        num_branches=experiment.n_branches,
                         out_filters=args['child_out_filters'],
                         lstm_size=args['controller_lstm_size'],
                         lstm_num_layers=args['controller_lstm_num_layers'],
@@ -33,8 +33,9 @@ controller = Controller(search_for=args['search_for'],
                         skip_weight=args['controller_skip_weight'])
 controller = controller.cuda()
 
-shared_cnn = SharedCNN(num_layers=args['child_num_layers'],
-                       num_branches=n_branches,
+shared_cnn = SharedCNN(experiment,
+                       num_layers=args['child_num_layers'],
+                       num_branches=experiment.n_branches,
                        out_filters=args['child_out_filters'],
                        keep_prob=args['child_keep_prob'])
 
