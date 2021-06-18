@@ -7,6 +7,7 @@ class ConvBranch(nn.Module):
     '''
     https://github.com/melodyguan/enas/blob/master/src/cifar10/general_child.py#L483
     '''
+
     def __init__(self,
                  in_planes,
                  out_planes,

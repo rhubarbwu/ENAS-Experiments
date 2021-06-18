@@ -2,6 +2,7 @@ from torch import nn
 
 
 class SeparableConv(nn.Module):
+
     def __init__(self,
                  in_planes,
                  out_planes,
@@ -20,8 +21,8 @@ class SeparableConv(nn.Module):
                                    bias=bias)
         self.pointwise = nn.Conv2d(in_planes,
                                    out_planes,
-                                   kernel_size=kernel_size,
-                                   padding=padding,
+                                   kernel_size=1,
+                                   padding=0,
                                    groups=in_planes,
                                    bias=bias)
 
