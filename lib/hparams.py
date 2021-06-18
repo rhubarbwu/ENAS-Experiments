@@ -21,7 +21,6 @@ args = {
     "child_out_filters": 36,
     "child_grad_bound": 5.0,
     "child_l2_reg": 0.00025,
-    "child_num_branches": 3,
     "child_keep_prob": 0.9,
     "child_lr_max": 0.05,
     "child_lr_min": 0.0005,

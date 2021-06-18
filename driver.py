@@ -16,13 +16,14 @@ torch.cuda.manual_seed(args['seed'])
 data_loaders = load_datasets(args)
 
 from sys import argv
+
 arg = argv[1]
-args["child_num_branches"] = ns_branches[arg]
+n_branches = ns_branches[arg]
 
 controller = Controller(search_for=args['search_for'],
                         search_whole_channels=True,
                         num_layers=args['child_num_layers'],
-                        num_branches=args['child_num_branches'],
+                        num_branches=n_branches,
                         out_filters=args['child_out_filters'],
                         lstm_size=args['controller_lstm_size'],
                         lstm_num_layers=args['controller_lstm_num_layers'],
@@ -33,7 +34,7 @@ controller = Controller(search_for=args['search_for'],
 controller = controller.cuda()
 
 shared_cnn = SharedCNN(num_layers=args['child_num_layers'],
-                       num_branches=args['child_num_branches'],
+                       num_branches=n_branches,
                        out_filters=args['child_out_filters'],
                        keep_prob=args['child_keep_prob'])
 

@@ -252,7 +252,7 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
                    index=False)
 
 
-def train_fixed(start_epoch, controller, shared_cnn, data_loaders):
+def train_fixed(start_epoch, controller, shared_cnn, data_loaders, n_branches):
     """Train a fixed cnn architecture.
     Args:
         start_epoch: Epoch to begin on.
@@ -278,7 +278,7 @@ def train_fixed(start_epoch, controller, shared_cnn, data_loaders):
 
     fixed_cnn = SharedCNN(
         num_layers=args['child_num_layers'],
-        num_branches=args['child_num_branches'],
+        num_branches=n_branches,
         out_filters=512 // 4,  # args.child_out_filters
         keep_prob=args['child_keep_prob'],
         fixed_arc=best_arc)
