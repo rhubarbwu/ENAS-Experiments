@@ -7,14 +7,14 @@ class ConvBranch(nn.Module):
     '''
     https://github.com/melodyguan/enas/blob/master/src/cifar10/general_child.py#L483
     '''
-
     def __init__(self,
                  in_planes,
                  out_planes,
                  kernel_size,
                  padding=0,
                  dilation=1,
-                 stride=1):
+                 stride=1,
+                 separable=False):
         super(ConvBranch, self).__init__()
 
         self.in_planes = in_planes
@@ -29,14 +29,28 @@ class ConvBranch(nn.Module):
                       dilation=dilation),
             nn.BatchNorm2d(out_planes, track_running_stats=False), nn.ReLU())
 
-        self.out_conv = nn.Sequential(
-            SeparableConv(in_planes,
+        if separable:
+            self.out_conv = nn.Sequential(
+                SeparableConv(in_planes,
+                              out_planes,
+                              kernel_size=kernel_size,
+                              padding=padding,
+                              dilation=dilation,
+                              stride=stride,
+                              bias=False),
+                nn.BatchNorm2d(out_planes, track_running_stats=False),
+                nn.ReLU())
+        else:
+            self.out_conv = nn.Sequential(
+                nn.Conv2d(in_planes,
                           out_planes,
                           kernel_size=kernel_size,
                           padding=padding,
                           dilation=dilation,
+                          stride=stride,
                           bias=False),
-            nn.BatchNorm2d(out_planes, track_running_stats=False), nn.ReLU())
+                nn.BatchNorm2d(out_planes, track_running_stats=False),
+                nn.ReLU())
 
     def forward(self, x):
         out = self.inp_conv1(x)
