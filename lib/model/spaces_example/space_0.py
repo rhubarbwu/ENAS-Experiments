@@ -8,20 +8,20 @@ def set_func(layer, in_planes, out_planes):
 
     layer.branch_0 = ConvBranch(in_planes,
                                 out_planes,
-                                kernel_size=5,
+                                kernel_size=3,
                                 padding=1)
     layer.branch_1 = ConvBranch(in_planes,
                                 out_planes,
-                                kernel_size=5,
+                                kernel_size=3,
                                 padding=1,
                                 separable=True)
     layer.branch_2 = ConvBranch(in_planes,
                                 out_planes,
-                                kernel_size=7,
+                                kernel_size=5,
                                 padding=2)
     layer.branch_3 = ConvBranch(in_planes,
                                 out_planes,
-                                kernel_size=7,
+                                kernel_size=5,
                                 padding=2,
                                 separable=True)
     layer.branch_4 = PoolBranch(in_planes, out_planes, 'avg')
