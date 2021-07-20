@@ -258,7 +258,7 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
         "good_layers_best": np.array(best_goods),
         "bad_layers_best": np.array(best_bads)
     })
-    metrics.to_csv("experiments/{}_{}".format(args["space"], datetime.now()),
+    metrics.to_csv("results/{}_{}".format(args["space"], datetime.now()),
                    index=False)
 
 

@@ -1,5 +1,5 @@
-from ..conv_branch import ConvBranch
-from ..pool_branch import PoolBranch
+from lib.model.conv_branch import ConvBranch
+from lib.model.pool_branch import PoolBranch
 
 n_branches = 6
 

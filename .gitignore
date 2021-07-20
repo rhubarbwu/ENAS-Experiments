@@ -1,8 +1,10 @@
 export
 experiments/*
-lib/model/spaces
+results/*
 __pycache__/
 *.log
 *.pyc
 *.tar
 .*
+
+!experiments/example

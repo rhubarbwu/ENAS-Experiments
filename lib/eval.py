@@ -1,5 +1,8 @@
-from .hparams import args
-from .model.spaces import bad_op_split
+from lib.hparams import args
+from importlib import import_module
+
+experiment_set = import_module("experiments.{}".format(args["set"]))
+bad_op_split = experiment_set.bad_op_split
 
 import numpy as np
 import torch

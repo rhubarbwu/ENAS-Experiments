@@ -1,5 +1,13 @@
-from lib.dataset import load_datasets
 from lib.hparams import args
+
+from sys import argv
+from importlib import import_module
+
+args["set"], args["experiment"] = argv[1], argv[2]
+experiment = import_module("experiments.{}.{}".format(args["set"],
+                                                      args["experiment"]))
+
+from lib.dataset import load_datasets
 from lib.model.controller import Controller
 from lib.model.shared_cnn import SharedCNN
 from lib.train import train_enas, train_fixed
@@ -13,12 +21,6 @@ np.random.seed(args['seed'])
 torch.cuda.manual_seed(args['seed'])
 
 data_loaders = load_datasets(args)
-
-from sys import argv
-from importlib import import_module
-
-arg = argv[1]
-experiment = import_module("lib.model.spaces.{}".format(arg))
 
 controller = Controller(search_for=args['search_for'],
                         search_whole_channels=True,
@@ -68,8 +70,10 @@ if args['resume']:
         print(checkpoint.keys())
         shared_cnn.load_state_dict(checkpoint['shared_cnn_state_dict'])
         controller.load_state_dict(checkpoint['controller_state_dict'])
-        shared_cnn_optimizer.load_state_dict(checkpoint['shared_cnn_optimizer'])
-        controller_optimizer.load_state_dict(checkpoint['controller_optimizer'])
+        shared_cnn_optimizer.load_state_dict(
+            checkpoint['shared_cnn_optimizer'])
+        controller_optimizer.load_state_dict(
+            checkpoint['controller_optimizer'])
         shared_cnn_scheduler.optimizer = shared_cnn_optimizer  # Not sure if this actually works
         print("Loaded checkpoint '{}' (epoch {})".format(
             args['resume'], checkpoint['epoch']))
@@ -80,8 +84,8 @@ else:
 
 if not args['fixed_arc']:
     train_enas(start_epoch, controller, shared_cnn, data_loaders,
-               shared_cnn_optimizer, controller_optimizer, shared_cnn_scheduler,
-               args)
+               shared_cnn_optimizer, controller_optimizer,
+               shared_cnn_scheduler, args)
 else:
     assert args[
         'resume'] != '', 'A pretrained model should be used when training a fixed architecture.'

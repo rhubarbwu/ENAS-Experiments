@@ -1,9 +1,9 @@
 #!/bin/sh
-spaces_path=./lib/model/spaces
-rm -rf $spaces_path
+experiments=./experiments/
 
-if [ $# -eq 0 ]; then
-    cp -r lib/model/spaces_example $spaces_path
-else
-    git clone --depth 1 $1 $spaces_path
+if [ $# -eq 2 ]; then
+    rm -rf $experiments/$2
 fi
+
+cd $experiments
+git clone $1
