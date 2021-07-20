@@ -4,26 +4,36 @@ This codebase has been adapted to run experiments on improving/evaluating the ro
 
 ## Requirements
 
-_These are the versions we used but lower versions might work as well._
-
-- `matplotlib` 3.3.4
-- `pandas`
-- `python` 3.8.8
-- `pytorch` 1.8.1
+```sh
+pip install -r requirements.txt
+```
 
 ## Setup
 
-Prepare the experiments in `./lib/model/spaces` by running `fetch-spaces.sh`.
+Prepare the experiments in `experiments/` by running `fetch-spaces.sh`.
 
 ```sh
 # default ENAS experiment set
 sh fetch-spaces.sh
 
 # poisoning ENAS experiment set
-sh fetch-spaces.sh git@github.com:rusbridger/ENAS-poisoning.git
+sh fetch-spaces.sh git@github.com:rusbridger/enas_poisoning.git enas_poisoning.git
 
 # typed ENAS experiment set
-sh fetch-spaces.sh git@github.com:rusbridger/ENAS-types.git
+sh fetch-spaces.sh git@github.com:rusbridger/enas_types.git
+```
+
+## Running
+
+```sh
+# default ENAS experiment set
+python driver.py example space_0
+
+# poisoning ENAS experiment set
+python driver.py enas_poisoning poisoning_0
+
+# typed ENAS experiment set
+python driver.py enas_types types_0
 ```
 
 ---
