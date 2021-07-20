@@ -1,10 +1,11 @@
-from .model.average_meter import AverageMeter
-from .eval import evaluate_model
-from .hparams import args
+from lib.model.average_meter import AverageMeter
+from lib.eval import evaluate_model
+from lib.hparams import args
 
 from datetime import datetime
-import pandas as pd
 import numpy as np
+from os.path import isfile
+import pandas as pd
 from time import time
 import torch
 from torch import nn
@@ -208,8 +209,22 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
 
     baseline = None
 
-    val_accs, test_accs, reward_avgs, reward_finals = [], [], [], []
-    avg_goods, avg_bads, best_goods, best_bads = [], [], [], []
+    csv_filename_base = "results/{}_{}".format(args["set"], args["experiment"])
+    if isfile(csv_filename_base):
+        metrics = pd.read_csv(csv_filename_base)
+        print("WORKING CSV LOCATED")
+    else:
+        metrics = pd.DataFrame({
+            "val": np.array([]),
+            "test": np.array([]),
+            "reward_avg": np.array([]),
+            "reward_finals": np.array([]),
+            "good_layers_avg": np.array([]),
+            "bad_layers_avg": np.array([]),
+            "good_layers_best": np.array([]),
+            "bad_layers_best": np.array([])
+        })
+        print("CREATING NEW CSV")
 
     for epoch in range(start_epoch, args['num_epochs']):
 
@@ -225,14 +240,20 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
             val_acc, test_acc, avg_good, avg_bad, best_good, best_bad = evaluate_model(
                 epoch, controller, shared_cnn, data_loaders)
 
-            val_accs.append(val_acc)
-            test_accs.append(test_acc)
-            reward_avgs.append(reward_vals[0])
-            reward_finals.append(reward_vals[1].detach().cpu())
-            avg_goods.append(avg_good)
-            avg_bads.append(avg_bad)
-            best_goods.append(best_good)
-            best_bads.append(best_bad)
+            metrics.loc[epoch] = [
+                val_acc.cpu(),
+                test_acc.cpu(), reward_vals[0].detach().cpu(),
+                reward_vals[1].detach().cpu(), avg_good, avg_bad, best_good,
+                best_bad
+            ]
+
+            csv_filename = "{}{}".format(
+                csv_filename_base,
+                "_{}".format(datetime.now()) if epoch == args['num_epochs'] -
+                1 else "")
+
+            metrics.to_csv(csv_filename, index=False)
+            print("RESULTS SAVED TO {}".format(csv_filename))
 
         # shared_cnn_scheduler.step(epoch)
         shared_cnn_scheduler.step()
@@ -245,21 +266,9 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
             'shared_cnn_optimizer': shared_cnn_optimizer.state_dict(),
             'controller_optimizer': controller_optimizer.state_dict()
         }
-        filename = args['output_filename'] + '.pth.tar'
-        torch.save(state, filename)
-
-    metrics = pd.DataFrame({
-        "val": np.array(val_accs),
-        "test": np.array(test_accs),
-        "reward_avg": np.array(reward_avgs),
-        "reward_finals": np.array(reward_finals),
-        "good_layers_avg": np.array(avg_goods),
-        "bad_layers_avg": np.array(avg_bads),
-        "good_layers_best": np.array(best_goods),
-        "bad_layers_best": np.array(best_bads)
-    })
-    metrics.to_csv("results/{}_{}".format(args["space"], datetime.now()),
-                   index=False)
+        model_filename = args['output_filename']
+        torch.save(state, model_filename)
+        print("MODEL SAVED TO {}".format(model_filename))
 
 
 def train_fixed(start_epoch, controller, shared_cnn, data_loaders, n_branches):

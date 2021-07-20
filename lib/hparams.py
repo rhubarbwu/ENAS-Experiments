@@ -5,7 +5,7 @@ args = {
 
     # training parameters
     "data_path": "export/data/",
-    "output_filename": "ENAS",
+    "output_filename": "",
     "resume": "",
     "batch_size": 128,
     "num_epochs": 300,
@@ -41,5 +41,6 @@ args = {
     "controller_bl_dec": 0.99,
 
     # search space
-    "space": -1,
+    "set": "baseline",
+    "experiment": "space_0",
 }

@@ -3,9 +3,13 @@ from lib.hparams import args
 from sys import argv
 from importlib import import_module
 
-args["set"], args["experiment"] = argv[1], argv[2]
+if len(argv) == 4:
+    args["set"], args["experiment"], args["num_epochs"] = argv[1], argv[
+        2], int(argv[3])
 experiment = import_module("experiments.{}.{}".format(args["set"],
                                                       args["experiment"]))
+args["output_filename"] = args["resume"] = "checkpoints/{}.{}.pth.tar".format(
+    args["set"], args["experiment"])
 
 from lib.dataset import load_datasets
 from lib.model.controller import Controller
@@ -61,26 +65,20 @@ shared_cnn_scheduler = CosineAnnealingLR(optimizer=shared_cnn_optimizer,
                                          T_max=args['child_lr_T'],
                                          eta_min=args['child_lr_min'])
 
-if args['resume']:
-    if isfile(args['resume']):
-        print("Loading checkpoint '{}'".format(args['resume']))
-        checkpoint = torch.load(args['resume'])
-        start_epoch = checkpoint['epoch']
-        # args = checkpoint['args']
-        print(checkpoint.keys())
-        shared_cnn.load_state_dict(checkpoint['shared_cnn_state_dict'])
-        controller.load_state_dict(checkpoint['controller_state_dict'])
-        shared_cnn_optimizer.load_state_dict(
-            checkpoint['shared_cnn_optimizer'])
-        controller_optimizer.load_state_dict(
-            checkpoint['controller_optimizer'])
-        shared_cnn_scheduler.optimizer = shared_cnn_optimizer  # Not sure if this actually works
-        print("Loaded checkpoint '{}' (epoch {})".format(
-            args['resume'], checkpoint['epoch']))
-    else:
-        raise ValueError("No checkpoint found at '{}'".format(args['resume']))
-else:
-    start_epoch = 0
+start_epoch = 0
+if args['resume'] and isfile(args['resume']):
+    print("Loading checkpoint '{}'".format(args['resume']))
+    checkpoint = torch.load(args['resume'])
+    start_epoch = checkpoint['epoch']
+    # args = checkpoint['args']
+    print(checkpoint.keys())
+    shared_cnn.load_state_dict(checkpoint['shared_cnn_state_dict'])
+    controller.load_state_dict(checkpoint['controller_state_dict'])
+    shared_cnn_optimizer.load_state_dict(checkpoint['shared_cnn_optimizer'])
+    controller_optimizer.load_state_dict(checkpoint['controller_optimizer'])
+    shared_cnn_scheduler.optimizer = shared_cnn_optimizer  # Not sure if this actually works
+    print("Loaded checkpoint '{}' (epoch {})".format(args['resume'],
+                                                     checkpoint['epoch']))
 
 if not args['fixed_arc']:
     train_enas(start_epoch, controller, shared_cnn, data_loaders,
