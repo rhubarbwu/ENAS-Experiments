@@ -27,7 +27,7 @@ sh fetch-spaces.sh git@github.com:rusbridger/enas_types.git
 
 ```sh
 # default ENAS experiment set
-python driver.py example space_0
+python driver.py baseline space_0
 
 # poisoning ENAS experiment set
 python driver.py enas_poisoning poisoning_0

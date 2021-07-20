@@ -7,5 +7,5 @@ __pycache__/
 *.tar
 .*
 
-!experiments/example
+!experiments/baseline
 !.gitkeep
