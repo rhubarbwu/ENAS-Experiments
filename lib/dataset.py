@@ -53,14 +53,14 @@ def load_datasets(args):
         dataset=train_subset,
         batch_size=args['batch_size'],
         shuffle=True,
-        pin_memory=False,
+        pin_memory=True,
         num_workers=2)
 
     data_loaders['valid_subset'] = torch.utils.data.DataLoader(
         dataset=valid_subset,
         batch_size=args['batch_size'],
         shuffle=True,
-        pin_memory=False,
+        pin_memory=True,
         num_workers=2,
         drop_last=True)
 
@@ -68,14 +68,14 @@ def load_datasets(args):
         dataset=train_dataset,
         batch_size=args['batch_size'],
         shuffle=True,
-        pin_memory=False,
+        pin_memory=True,
         num_workers=2)
 
     data_loaders['test_dataset'] = torch.utils.data.DataLoader(
         dataset=test_dataset,
         batch_size=args['batch_size'],
         shuffle=False,
-        pin_memory=False,
+        pin_memory=True,
         num_workers=2)
 
     return data_loaders
