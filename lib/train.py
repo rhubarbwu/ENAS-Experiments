@@ -69,8 +69,8 @@ def train_shared_cnn(epoch,
         train_acc = torch.mean((torch.max(pred,
                                           1)[1] == labels).type(torch.float))
 
-        train_acc_meter.update(train_acc)
-        loss_meter.update(loss)
+        train_acc_meter.update(train_acc.item())
+        loss_meter.update(loss.item())
 
         end = time()
 
@@ -156,10 +156,10 @@ def train_controller(epoch,
         if args['controller_skip_weight'] is not None:
             loss += args['controller_skip_weight'] * controller.skip_penaltys
 
-        reward_meter.update(reward)
-        baseline_meter.update(baseline)
-        val_acc_meter.update(val_acc)
-        loss_meter.update(loss)
+        reward_meter.update(reward.item())
+        baseline_meter.update(baseline.item())
+        val_acc_meter.update(val_acc.item())
+        loss_meter.update(loss.item())
 
         # Average gradient over controller_num_aggregate samples
         loss = loss / args['controller_num_aggregate']
@@ -179,7 +179,7 @@ def train_controller(epoch,
                 learning_rate = controller_optimizer.param_groups[0]['lr']
                 display = 'ctrl_step=' + str(i) + \
                           '\tloss=%.3f' % (loss_meter.val) + \
-                          '\tent=%.2f' % (controller.sample_entropy) + \
+                          '\tent=%.2f' % (controller.sample_entropy.item()) + \
                           '\tlr=%.4f' % (learning_rate) + \
                           '\t|g|=%.4f' % (grad_norm) + \
                           '\tacc=%.4f' % (val_acc_meter.val) + \
@@ -241,8 +241,7 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
                 epoch, controller, shared_cnn, data_loaders)
 
             metrics.loc[epoch] = [
-                val_acc.cpu(),
-                test_acc.cpu(), reward_vals[0].detach().cpu(),
+                val_acc, test_acc, reward_vals[0],
                 reward_vals[1].detach().cpu(), avg_good, avg_bad, best_good,
                 best_bad
             ]
