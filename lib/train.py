@@ -210,8 +210,9 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
     baseline = None
 
     csv_filename_base = "results/{}_{}".format(args["set"], args["experiment"])
-    if isfile(csv_filename_base):
-        metrics = pd.read_csv(csv_filename_base)
+    csv_filename_temp = "{}.temp".format(csv_filename_base)
+    if isfile(csv_filename_temp):
+        metrics = pd.read_csv(csv_filename_temp)
         print("WORKING CSV LOCATED")
     else:
         metrics = pd.DataFrame({
@@ -249,7 +250,7 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
             csv_filename = "{}{}".format(
                 csv_filename_base,
                 "_{}".format(datetime.now()) if epoch == args['num_epochs'] -
-                1 else "")
+                1 else ".temp")
 
             metrics.to_csv(csv_filename, index=False)
             print("RESULTS SAVED TO {}".format(csv_filename))
