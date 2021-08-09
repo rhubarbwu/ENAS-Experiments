@@ -170,8 +170,8 @@ def train_controller(epoch,
 
         # Aggregate gradients for controller_num_aggregate iterationa, then update weights
         if (i + 1) % args['controller_num_aggregate'] == 0:
-            grad_norm = torch.nn.utils.clip_grad_norm_(
-                controller.parameters(), args['child_grad_bound'])
+            grad_norm = torch.nn.utils.clip_grad_norm_(controller.parameters(),
+                                                       args['child_grad_bound'])
             controller_optimizer.step()
             controller.zero_grad()
 
@@ -192,8 +192,8 @@ def train_controller(epoch,
 
 
 def train_enas(start_epoch, controller, shared_cnn, data_loaders,
-               shared_cnn_optimizer, controller_optimizer,
-               shared_cnn_scheduler, args):
+               shared_cnn_optimizer, controller_optimizer, shared_cnn_scheduler,
+               args):
     """Perform architecture search by training a controller and shared_cnn.
     Args:
         start_epoch: Epoch to begin on.
@@ -249,7 +249,7 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
 
             csv_filename = "{}{}".format(
                 csv_filename_base,
-                "_{}".format(datetime.now()) if epoch == args['num_epochs'] -
+                "+{}".format(datetime.now()) if epoch == args['num_epochs'] -
                 1 else ".temp")
 
             metrics.to_csv(csv_filename, index=False)
