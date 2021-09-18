@@ -1,30 +1,32 @@
+### Args and Modules
 from lib.hparams import args
-
 from sys import argv
-from importlib import import_module
-
 if len(argv) == 4:
-    args["set"], args["experiment"], args["num_epochs"] = argv[1], argv[
-        2], int(argv[3])
-experiment = import_module("experiments.{}.{}".format(args["set"],
-                                                      args["experiment"]))
+    args["set"], args["experiment"], args["num_epochs"] = argv[1], argv[2], int(
+        argv[3])
 args["output_filename"] = args["resume"] = "checkpoints/{}.{}.pth.tar".format(
     args["set"], args["experiment"])
 
-from lib.dataset import load_datasets
-from lib.model.controller import Controller
-from lib.model.shared_cnn import SharedCNN
-from lib.train import train_enas, train_fixed
+### Modules
+from importlib import import_module
 
+experiment = import_module("experiments.{}.{}".format(args["set"],
+                                                      args["experiment"]))
+
+### NumPy Seeds
 import numpy as np
-from os.path import isfile
 import torch
-from torch.optim.lr_scheduler import CosineAnnealingLR
 
 np.random.seed(args['seed'])
 torch.cuda.manual_seed(args['seed'])
 
+### DataLoader
+from lib.dataset import load_datasets
+
 data_loaders = load_datasets(args)
+
+### Controller
+from lib.model.controller import Controller
 
 controller = Controller(search_for=args['search_for'],
                         search_whole_channels=True,
@@ -38,6 +40,9 @@ controller = Controller(search_for=args['search_for'],
                         skip_target=args['controller_skip_target'],
                         skip_weight=args['controller_skip_weight'])
 controller = controller.cuda()
+
+### SharedCNN
+from lib.model.shared_cnn import SharedCNN
 
 shared_cnn = SharedCNN(experiment,
                        num_layers=args['child_num_layers'],
@@ -60,12 +65,16 @@ shared_cnn_optimizer = torch.optim.SGD(params=shared_cnn.parameters(),
                                        nesterov=True,
                                        weight_decay=args['child_l2_reg'])
 
+### CosineAnnealingLR
+from torch.optim.lr_scheduler import CosineAnnealingLR
+
 # https://github.com/melodyguan/enas/blob/master/src/utils.py#L154
 shared_cnn_scheduler = CosineAnnealingLR(optimizer=shared_cnn_optimizer,
                                          T_max=args['child_lr_T'],
                                          eta_min=args['child_lr_min'])
 
 start_epoch = 0
+from os.path import isfile
 if args['resume'] and isfile(args['resume']):
     print("Loading checkpoint '{}'".format(args['resume']))
     checkpoint = torch.load(args['resume'])
@@ -80,10 +89,13 @@ if args['resume'] and isfile(args['resume']):
     print("Loaded checkpoint '{}' (epoch {})".format(args['resume'],
                                                      checkpoint['epoch']))
 
+### TRAINING
+from lib.train import train_enas, train_fixed
+
 if not args['fixed_arc']:
     train_enas(start_epoch, controller, shared_cnn, data_loaders,
-               shared_cnn_optimizer, controller_optimizer,
-               shared_cnn_scheduler, args)
+               shared_cnn_optimizer, controller_optimizer, shared_cnn_scheduler,
+               args)
 else:
     assert args[
         'resume'] != '', 'A pretrained model should be used when training a fixed architecture.'
