@@ -6,13 +6,15 @@ from torch import nn
 
 
 class SharedCNN(nn.Module):
+
     def __init__(self,
                  experiment,
                  num_layers=12,
                  num_branches=6,
                  out_filters=24,
                  keep_prob=1.0,
-                 fixed_arc=None):
+                 fixed_arc=None,
+                 n_classes=10):
         super(SharedCNN, self).__init__()
 
         self.num_layers = num_layers
@@ -38,8 +40,7 @@ class SharedCNN(nn.Module):
                                   experiment.set_func, experiment.pick_func)
 
             else:
-                layer = FixedLayer(layer_id, self.out_filters,
-                                   self.out_filters,
+                layer = FixedLayer(layer_id, self.out_filters, self.out_filters,
                                    self.fixed_arc[str(layer_id)])
             self.layers.append(layer)
 
@@ -58,7 +59,7 @@ class SharedCNN(nn.Module):
 
         self.global_avg_pool = nn.AdaptiveAvgPool2d((1, 1))
         self.dropout = nn.Dropout(p=1. - self.keep_prob)
-        self.classify = nn.Linear(self.out_filters, 10)
+        self.classify = nn.Linear(self.out_filters, args["n_classes"])
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -73,8 +74,7 @@ class SharedCNN(nn.Module):
         prev_layers = []
         pool_count = 0
         for layer_id in range(self.num_layers):
-            x = self.layers[layer_id](x, prev_layers,
-                                      sample_arc[str(layer_id)])
+            x = self.layers[layer_id](x, prev_layers, sample_arc[str(layer_id)])
             prev_layers.append(x)
             if layer_id in self.pool_layers:
                 for i, prev_layer in enumerate(prev_layers):

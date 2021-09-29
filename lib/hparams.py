@@ -1,7 +1,15 @@
+from torchvision.datasets import CIFAR10
+
 args = {
     # basic hyperparameters
     "description": "ENAS",
     "search_for": "macro",
+
+    # dataset
+    "dataset": CIFAR10,
+    "n_classes": 10,
+    "n_train": 45000,
+    "n_val": 5000,
 
     # training parameters
     "data_path": "export/data/",

@@ -1,6 +1,10 @@
 import torch
 from torch.utils.data import Subset
 from torchvision import datasets, transforms
+from .hparams import args
+
+DATASET = args["dataset"]
+n_train, n_val = args["n_train"], args["n_val"]
 
 
 def load_datasets(args):
@@ -28,23 +32,23 @@ def load_datasets(args):
 
     test_transform = transforms.Compose([transforms.ToTensor(), normalize])
 
-    train_dataset = datasets.CIFAR10(root=args['data_path'],
-                                     train=True,
-                                     transform=train_transform,
-                                     download=True)
+    train_dataset = DATASET(root=args['data_path'],
+                            train=True,
+                            transform=train_transform,
+                            download=True)
 
-    valid_dataset = datasets.CIFAR10(root=args['data_path'],
-                                     train=True,
-                                     transform=valid_transform,
-                                     download=True)
+    valid_dataset = DATASET(root=args['data_path'],
+                            train=True,
+                            transform=valid_transform,
+                            download=True)
 
-    test_dataset = datasets.CIFAR10(root=args['data_path'],
-                                    train=False,
-                                    transform=test_transform,
-                                    download=True)
+    test_dataset = DATASET(root=args['data_path'],
+                           train=False,
+                           transform=test_transform,
+                           download=True)
 
-    train_indices = list(range(0, 45000))
-    valid_indices = list(range(45000, 50000))
+    train_indices = list(range(0, n_train))
+    valid_indices = list(range(n_train, n_train + n_val))
     train_subset = Subset(train_dataset, train_indices)
     valid_subset = Subset(valid_dataset, valid_indices)
 
