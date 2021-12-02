@@ -1,6 +1,6 @@
 # ENAS Experiments
 
-This codebase has been adapted to run experiments on improving/evaluating the robustness of the ENAS algorithm.
+This codebase has been adapted to run experiments on improving/evaluating the robustness of the ENAS algorithm. Thanks to [Melody Guan](https://www.linkedin.com/in/melodyguan) for the [basis of work](https://github.com/melodyguan/enas).
 
 ## Requirements
 
@@ -13,15 +13,16 @@ pip install -r requirements.txt
 Prepare the experiments in `experiments/` by running `fetch-spaces.sh`.
 
 ```sh
-# default ENAS experiment set
-sh fetch-spaces.sh
-
-# poisoning ENAS experiment set
-sh fetch-spaces.sh git@github.com:rusbridger/enas_poisoning.git enas_poisoning.git
-
-# typed ENAS experiment set
-sh fetch-spaces.sh git@github.com:rusbridger/enas_types.git
+sh fetch-spaces.sh <experiment-set-url> experiments/<experiment-set-name>
 ```
+
+You can name `<experiment-set-name>` whatever you like. We provide the following experiment sets for `<experiment-set-url>`.
+
+- Search Space Poisoning (SSP): https://github.com/rusbridger/enas_poisoning
+  - [Poisoning the Search Space in Neural Architecture Search](https://openreview.net/forum?id=fB3z4GrHCYv)
+  - [Towards One Shot Search Space Poisoning in Neural Architecture Search](https://arxiv.org/abs/2111.07138)
+- Typed NAS: https://github.com/rusbridger/enas_types
+  - [NeuralArTS: Structuring Neural Architecture Search with Type Theory](https://arxiv.org/abs/2110.08710)
 
 ## Running
 
