@@ -1,11 +1,16 @@
 ### Args and Modules
 from lib.hparams import args
 from sys import argv
-if len(argv) == 4:
+if len(argv) >= 4:
     args["set"], args["experiment"], args["num_epochs"] = argv[1], argv[2], int(
         argv[3])
 args["output_filename"] = args["resume"] = "checkpoints/{}.{}.pth.tar".format(
     args["set"], args["experiment"])
+
+if len(argv) == 5:
+    args["q"] = argv[4]
+    args["output_filename"] = args["output_filename"].replace(
+        ".pth", "_{}.pth".format(args["q"]))
 
 ### Modules
 from importlib import import_module

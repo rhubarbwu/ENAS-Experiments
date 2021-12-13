@@ -1,3 +1,6 @@
+from ..hparams import args
+from .qomb import init_Q, sample
+
 import torch
 from torch import nn
 
@@ -22,6 +25,8 @@ class Controller(nn.Module):
                  skip_target=0.4,
                  skip_weight=0.8):
         super(Controller, self).__init__()
+
+        self.Q = init_Q(num_branches)
 
         self.search_for = search_for
         self.search_whole_channels = search_whole_channels
@@ -75,12 +80,13 @@ class Controller(nn.Module):
         '''
         https://github.com/melodyguan/enas/blob/master/src/cifar10/general_controller.py#L126
         '''
+
         h0 = None  # setting h0 to None will initialize LSTM state with 0s
 
         anchors = []
         anchors_w_1 = []
 
-        arc_seq = {}
+        arc_seq = []
         entropys = []
         log_probs = []
         skip_count = []
@@ -97,7 +103,12 @@ class Controller(nn.Module):
                 output = output.squeeze(0)
                 h0 = hn
 
-                logit = self.w_soft(output)
+                if args["q"] is not None:
+                    logit = torch.from_numpy(sample(
+                        self.Q, arc_seq)).cuda().unsqueeze(0)
+                else:
+                    logit = self.w_soft(output)
+
                 if self.temperature is not None:
                     logit /= self.temperature
                 if self.tanh_constant is not None:
@@ -105,8 +116,7 @@ class Controller(nn.Module):
 
                 branch_id_dist = Categorical(logits=logit)
                 branch_id = branch_id_dist.sample()
-
-                arc_seq[str(layer_id)] = [branch_id]
+                arc_seq.append([branch_id])
 
                 log_prob = branch_id_dist.log_prob(branch_id)
                 log_probs.append(log_prob.view(-1))
@@ -136,7 +146,7 @@ class Controller(nn.Module):
                 skip = skip_dist.sample()
                 skip = skip.view(layer_id)
 
-                arc_seq[str(layer_id)].append(skip)
+                arc_seq[layer_id].append(skip)
 
                 skip_prob = torch.sigmoid(logit)
                 kl = skip_prob * torch.log(skip_prob / skip_targets)
@@ -165,7 +175,7 @@ class Controller(nn.Module):
             anchors.append(output)
             anchors_w_1.append(self.w_attn_1(output))
 
-        self.sample_arc = arc_seq
+        self.sample_arc = {str(i): layer for i, layer in enumerate(arc_seq)}
 
         entropys = torch.cat(entropys)
         self.sample_entropy = torch.sum(entropys)

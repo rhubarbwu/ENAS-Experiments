@@ -1,6 +1,7 @@
-from lib.model.average_meter import AverageMeter
 from lib.eval import evaluate_model
 from lib.hparams import args
+from lib.model.average_meter import AverageMeter
+from lib.model.qomb import init_Q, sample, update
 
 from datetime import datetime
 import numpy as np
@@ -9,6 +10,8 @@ import pandas as pd
 from time import time
 import torch
 from torch import nn
+
+Q = None
 
 
 def train_shared_cnn(epoch,
@@ -144,6 +147,9 @@ def train_controller(epoch,
         reward = val_acc.clone().detach()
         reward += args['controller_entropy_weight'] * controller.sample_entropy
 
+        ops = [layer[0] for _, layer in sample_arc.items()]
+        controller.Q = update(controller.Q, ops, reward.item())
+
         if baseline is None:
             baseline = val_acc
         else:
@@ -210,6 +216,8 @@ def train_enas(start_epoch, controller, shared_cnn, data_loaders,
     baseline = None
 
     csv_filename_base = "results/{}_{}".format(args["set"], args["experiment"])
+    if args["q"] is not None:
+        csv_filename_base += "_" + args["q"]
     csv_filename_temp = "{}.temp".format(csv_filename_base)
     if isfile(csv_filename_temp):
         metrics = pd.read_csv(csv_filename_temp)
