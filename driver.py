@@ -9,7 +9,7 @@ args["output_filename"] = args["resume"] = "checkpoints/{}.{}.pth.tar".format(
 
 if len(argv) == 5:
     args["q"] = argv[4]
-    args["output_filename"] = args["output_filename"].replace(
+    args["output_filename"] = args["resume"] = args["output_filename"].replace(
         ".pth", "_{}.pth".format(args["q"]))
 
 ### Modules

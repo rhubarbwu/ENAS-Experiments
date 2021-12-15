@@ -1,7 +1,7 @@
 from lib.eval import evaluate_model
 from lib.hparams import args
 from lib.model.average_meter import AverageMeter
-from lib.model.qomb import init_Q, sample, update
+from lib.model.qenas import init_Q, sample, update
 
 from datetime import datetime
 import numpy as np
@@ -145,10 +145,9 @@ def train_controller(epoch,
 
         # detach to make sure that gradients aren't backpropped through the reward
         reward = val_acc.clone().detach()
-        reward += args['controller_entropy_weight'] * controller.sample_entropy
+        # reward += args['controller_entropy_weight'] * controller.sample_entropy
 
-        ops = [layer[0] for _, layer in sample_arc.items()]
-        controller.Q = update(controller.Q, ops, reward.item())
+        controller.Q = update(controller.Q, sample_arc, reward.item())
 
         if baseline is None:
             baseline = val_acc
@@ -157,7 +156,8 @@ def train_controller(epoch,
             # detach to make sure that gradients are not backpropped through the baseline
             baseline = baseline.detach()
 
-        loss = -1 * controller.sample_log_prob * (reward - baseline)
+        # loss = -1 * controller.sample_log_prob * (reward - baseline)
+        loss = baseline - reward
 
         if args['controller_skip_weight'] is not None:
             loss += args['controller_skip_weight'] * controller.skip_penaltys
@@ -170,24 +170,22 @@ def train_controller(epoch,
         # Average gradient over controller_num_aggregate samples
         loss = loss / args['controller_num_aggregate']
 
-        loss.backward(retain_graph=True)
+        # loss.backward(retain_graph=True)
 
         end = time()
 
         # Aggregate gradients for controller_num_aggregate iterationa, then update weights
         if (i + 1) % args['controller_num_aggregate'] == 0:
-            grad_norm = torch.nn.utils.clip_grad_norm_(controller.parameters(),
-                                                       args['child_grad_bound'])
-            controller_optimizer.step()
-            controller.zero_grad()
+            # grad_norm = torch.nn.utils.clip_grad_norm_(controller.parameters(),
+            #                                            args['child_grad_bound'])
+            # controller_optimizer.step()
+            # controller.zero_grad()
 
             if (i + 1) % (2 * args['controller_num_aggregate']) == 0:
                 learning_rate = controller_optimizer.param_groups[0]['lr']
                 display = 'ctrl_step=' + str(i) + \
                           '\tloss=%.3f' % (loss_meter.val) + \
-                          '\tent=%.2f' % (controller.sample_entropy.item()) + \
                           '\tlr=%.4f' % (learning_rate) + \
-                          '\t|g|=%.4f' % (grad_norm) + \
                           '\tacc=%.4f' % (val_acc_meter.val) + \
                           '\tbl=%.2f' % (baseline_meter.val) + \
                           '\ttime=%.2fit/s' % (1. / (end - start))

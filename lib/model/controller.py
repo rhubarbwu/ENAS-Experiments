@@ -1,5 +1,6 @@
+from numpy import arcsin
 from ..hparams import args
-from .qomb import init_Q, sample
+from .qenas import init_Q, sample
 
 import torch
 from torch import nn
@@ -27,6 +28,7 @@ class Controller(nn.Module):
         super(Controller, self).__init__()
 
         self.Q = init_Q(num_branches)
+        self.sample_entropy = torch.Tensor(0)
 
         self.search_for = search_for
         self.search_whole_channels = search_whole_channels
@@ -81,110 +83,9 @@ class Controller(nn.Module):
         https://github.com/melodyguan/enas/blob/master/src/cifar10/general_controller.py#L126
         '''
 
-        h0 = None  # setting h0 to None will initialize LSTM state with 0s
-
-        anchors = []
-        anchors_w_1 = []
-
         arc_seq = []
-        entropys = []
-        log_probs = []
-        skip_count = []
-        skip_penaltys = []
-
-        inputs = self.g_emb.weight
-        skip_targets = torch.tensor([1.0 - self.skip_target,
-                                     self.skip_target]).cuda()
 
         for layer_id in range(self.num_layers):
-            if self.search_whole_channels:
-                inputs = inputs.unsqueeze(0)
-                output, hn = self.w_lstm(inputs, h0)
-                output = output.squeeze(0)
-                h0 = hn
-
-                if args["q"] is not None:
-                    logit = torch.from_numpy(sample(
-                        self.Q, arc_seq)).cuda().unsqueeze(0)
-                else:
-                    logit = self.w_soft(output)
-
-                if self.temperature is not None:
-                    logit /= self.temperature
-                if self.tanh_constant is not None:
-                    logit = self.tanh_constant * torch.tanh(logit)
-
-                branch_id_dist = Categorical(logits=logit)
-                branch_id = branch_id_dist.sample()
-                arc_seq.append([branch_id])
-
-                log_prob = branch_id_dist.log_prob(branch_id)
-                log_probs.append(log_prob.view(-1))
-                entropy = branch_id_dist.entropy()
-                entropys.append(entropy.view(-1))
-
-                inputs = self.w_emb(branch_id)
-                inputs = inputs.unsqueeze(0)
-            else:
-                # https://github.com/melodyguan/enas/blob/master/src/cifar10/general_controller.py#L171
-                assert False, "Not implemented error: search_whole_channels = False"
-
-            output, hn = self.w_lstm(inputs, h0)
-            output = output.squeeze(0)
-
-            if layer_id > 0:
-                query = torch.cat(anchors_w_1, dim=0)
-                query = torch.tanh(query + self.w_attn_2(output))
-                query = self.v_attn(query)
-                logit = torch.cat([-query, query], dim=1)
-                if self.temperature is not None:
-                    logit /= self.temperature
-                if self.tanh_constant is not None:
-                    logit = self.tanh_constant * torch.tanh(logit)
-
-                skip_dist = Categorical(logits=logit)
-                skip = skip_dist.sample()
-                skip = skip.view(layer_id)
-
-                arc_seq[layer_id].append(skip)
-
-                skip_prob = torch.sigmoid(logit)
-                kl = skip_prob * torch.log(skip_prob / skip_targets)
-                kl = torch.sum(kl)
-                skip_penaltys.append(kl)
-
-                log_prob = skip_dist.log_prob(skip)
-                log_prob = torch.sum(log_prob)
-                log_probs.append(log_prob.view(-1))
-
-                entropy = skip_dist.entropy()
-                entropy = torch.sum(entropy)
-                entropys.append(entropy.view(-1))
-
-                # Calculate average hidden state of all nodes that got skips
-                # and use it as input for next step
-                skip = skip.type(torch.float)
-                skip = skip.view(1, layer_id)
-                skip_count.append(torch.sum(skip))
-                inputs = torch.matmul(skip, torch.cat(anchors, dim=0))
-                inputs /= (1.0 + torch.sum(skip))
-
-            else:
-                inputs = self.g_emb.weight
-
-            anchors.append(output)
-            anchors_w_1.append(self.w_attn_1(output))
+            arc_seq = sample(self.Q, arc_seq)
 
         self.sample_arc = {str(i): layer for i, layer in enumerate(arc_seq)}
-
-        entropys = torch.cat(entropys)
-        self.sample_entropy = torch.sum(entropys)
-
-        log_probs = torch.cat(log_probs)
-        self.sample_log_prob = torch.sum(log_probs)
-
-        skip_count = torch.stack(skip_count)
-        self.skip_count = torch.sum(skip_count)
-
-        skip_penaltys = torch.stack(skip_penaltys)
-        self.skip_penaltys = torch.mean(skip_penaltys)

@@ -45,7 +45,7 @@ args = {
     "controller_tanh_constant": 1.5,
     "controller_op_tanh_reduce": 2.5,
     "controller_skip_target": 0.4,
-    "controller_skip_weight": 0.8,
+    "controller_skip_weight": None,  #.8
     "controller_bl_dec": 0.99,
 
     # search space
