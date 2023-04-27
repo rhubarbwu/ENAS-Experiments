@@ -1,5 +1,5 @@
 export
-experiments/*
+# experiments/*
 results/*
 __pycache__/
 *.log

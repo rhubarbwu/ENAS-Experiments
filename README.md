@@ -10,19 +10,13 @@ pip install -r requirements.txt
 
 ## Setup
 
-Prepare the experiments in `experiments/` by running `fetch-spaces.sh`.
+Prepare the experiments in `experiments/`. You can name `<experiment-set-name>` whatever you like. We provide the following experiment sets for `<experiment-set-url>`.
 
-```sh
-sh fetch-spaces.sh <experiment-set-url> experiments/<experiment-set-name>
-```
-
-You can name `<experiment-set-name>` whatever you like. We provide the following experiment sets for `<experiment-set-url>`.
-
-- Search Space Poisoning (SSP): https://github.com/rusbridger/enas_poisoning
-  - [Poisoning the Search Space in Neural Architecture Search](https://openreview.net/forum?id=fB3z4GrHCYv)
-  - [Towards One Shot Search Space Poisoning in Neural Architecture Search](https://arxiv.org/abs/2111.07138)
-- Typed NAS: https://github.com/rusbridger/enas_types
-  - [NeuralArTS: Structuring Neural Architecture Search with Type Theory](https://arxiv.org/abs/2110.08710)
+- Search Space Poisoning (SSP): [`poisoning`](experiments/poisoning)
+  - [Poisoning the Search Space in Neural Architecture Search](https://openreview.net/forum?id=fB3z4GrHCYv) [[arXiv](https://arxiv.org/abs/2106.14406)]
+  - [Towards One Shot Search Space Poisoning in Neural Architecture Search](https://ojs.aaai.org/index.php/AAAI/article/view/21658) [[arXiv](https://arxiv.org/abs/2111.07138)]
+- Typed NAS: [`neuralarts`](experiments/neuralarts)
+  - [NeuralArTS: Structuring Neural Architecture Search with Type Theory](https://ojs.aaai.org/index.php/AAAI/article/view/21679) [[arXiv](https://arxiv.org/abs/2110.08710)]
 
 ## Running
 
@@ -33,10 +27,10 @@ Include the set, experiment, and number of epochs as arguments. They will defaul
 python driver.py baseline space_0 300
 
 # experiment from poisoning set
-python driver.py enas_poisoning poisoning_0 300
+python driver.py poisoning poisoning_0 300
 
 # experiment from typed set
-python driver.py enas_types types_0 300
+python driver.py neuralarts types_0 300
 ```
 
 ### Checkpoints & Results
